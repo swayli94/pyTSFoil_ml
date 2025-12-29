@@ -65,6 +65,8 @@ else:
     _fortran_available = False
 
 if _fortran_available:
+    # Import refactored modules
+    from .utils import clustcos
     from .pytsfoil import PyTSFoil
 else:
     # Provide a stub class that shows helpful error message
@@ -76,7 +78,12 @@ else:
                 f"  cd {Path(__file__).parent.parent}\n"
                 f"  python {Path(__file__).parent / 'compile_f2py.py'}"
             )
-
+    
 __version__ = (files(__package__) / "VERSION").read_text().strip()
 
-__all__ = ['PyTSFoil', '__version__']
+# Main interface is PyTSFoil, do not disclose other classes
+__all__ = [
+    'PyTSFoil', '__version__',
+    # Utility functions
+    'clustcos'
+]
