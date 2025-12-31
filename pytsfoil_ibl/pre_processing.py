@@ -157,12 +157,7 @@ class PreProcessing:
             tsf.solver_data.cdfact = cdfact
             tsf.solver_data.yfact = yfact
             tsf.solver_data.vfact = vfact
-            
-            # Scale Y mesh
-            yfaciv = 1.0 / yfact
-            for j in range(jmin, jmax + 1):
-                tsf.common_data.yin[j - 1] = tsf.common_data.yin[j - 1] * yfaciv
-            
+                        
             # Scale tunnel parameters (wall height)
             tsf.common_data.h = tsf.common_data.h / yfact
             tsf.common_data.por = tsf.common_data.por * yfact

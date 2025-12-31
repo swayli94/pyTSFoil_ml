@@ -72,8 +72,6 @@ class GeometryProcessor:
         self.core.airfoil['xl'] = xl
         self.core.airfoil['yl'] = yl
         
-        tsf.common_data.nu = xu.shape[0]
-        tsf.common_data.nl = xl.shape[0]
         tsf.common_data.delta = np.float32(t_max)
         
         tsf.common_data.xu[:len(xu)] = xu.astype(np.float32)

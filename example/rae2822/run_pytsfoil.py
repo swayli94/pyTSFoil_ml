@@ -1,6 +1,12 @@
 
 import os
+import sys
+
 path = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.abspath(os.path.join(path, '..', '..'))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
 
 '''
 # Optional: When doing multi-branch development,
@@ -13,7 +19,7 @@ if project_root not in sys.path:
 '''
 
 import numpy as np
-from pytsfoil import PyTSFoil
+from pytsfoil_ibl import PyTSFoil
 
 
 def run_pytsfoil(pytsfoil: PyTSFoil, airfoil_coordinates: np.ndarray, output=True):

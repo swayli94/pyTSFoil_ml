@@ -34,11 +34,8 @@ class MeshHandler:
         """
         Set mesh coordinates
         
-        User-defined mesh is provided to TSFOIL through 1D arrays XIN, YIN.
-        XIN and YIN are the x-coordinates and y-coordinates of mesh points, respectively.
         The mesh is a 2D non-uniform Cartesian grid.
         The airfoil has unit chord length, leading edge at (0,0), trailing edge at (1,0).
-        XIN distributes more points near x=0 and x=1, YIN distributes more points near y=0.
         
         Attributes
         ----------
@@ -103,16 +100,10 @@ class MeshHandler:
         self.core.mesh['yy'] = yy
         self.core.mesh['xx_airfoil'] = x_center
 
-        # imax, jmax equals imaxi, jmaxi,
-        # because mesh points are already checked to be odd for all sections (done in CKMESH in mesh_module.f90)
-        tsf.common_data.imaxi = self.core.config['n_point_x']
-        tsf.common_data.jmaxi = self.core.config['n_point_y']
         tsf.common_data.imax = self.core.config['n_point_x']
         tsf.common_data.jmax = self.core.config['n_point_y']
         
-        # Final mesh arrays x, y are the same as xin, yin
-        tsf.common_data.xin[:len(xx)] = xx.astype(np.float32)
-        tsf.common_data.yin[:len(yy)] = yy.astype(np.float32)
+        # Final mesh arrays x, y
         tsf.common_data.x[:len(xx)] = xx.astype(np.float32)
         tsf.common_data.y[:len(yy)] = yy.astype(np.float32)
     
@@ -142,7 +133,6 @@ class MeshHandler:
         
         # Number of points on airfoil
         self.core.mesh['nfoil'] = self.core.mesh['ite'] - self.core.mesh['ile'] + 1
-        tsf.common_data.nfoil = self.core.mesh['nfoil']
     
     def compute_geometry_derivatives(self) -> None:
         """
@@ -157,7 +147,6 @@ class MeshHandler:
                (fu, fl) and slopes (fxu, fxl) at mesh x-coordinates
             2. Compute airfoil cross-sectional area (volume) using Simpson's rule
             3. Apply flap deflection correction if enabled (IFLAP != 0)
-            4. Compute camber and thickness distributions
             5. Apply rigidity factor (RIGF) correction to surface slopes for 
                improved accuracy on thick airfoils in transonic flow
         
@@ -169,8 +158,6 @@ class MeshHandler:
         Outputs (stored in tsf.common_data):
             - fu, fl: Upper/lower surface y-coordinates at mesh points
             - fxu, fxl: Upper/lower surface slopes (dy/dx) - key boundary condition input
-            - xfoil: Airfoil mesh x-coordinates
-            - camber, thick: Camber line and half-thickness distributions
             - vol: Airfoil cross-sectional area
         """
         # Get data from common_data (Fortran module variables)
@@ -244,10 +231,6 @@ class MeshHandler:
                 fxu[i] = fxu[i] - dflap * delinv
                 fxl[i] = fxl[i] - dflap * delinv
         
-        # Compute camber and thickness
-        camber = 0.5 * (fu + fl)
-        thick = 0.5 * (fu - fl)
-        
         # Apply rigidity factor correction to surface slopes
         fxu = fxu / np.sqrt(1.0 + rigf * (delta * fxu)**2)
         fxl = fxl / np.sqrt(1.0 + rigf * (delta * fxl)**2)
@@ -260,9 +243,6 @@ class MeshHandler:
         tsf.common_data.fl[:nfoil] = fl.astype(np.float32)
         tsf.common_data.fxu[:nfoil] = fxu.astype(np.float32)
         tsf.common_data.fxl[:nfoil] = fxl.astype(np.float32)
-        tsf.common_data.xfoil[:nfoil] = xfoil.astype(np.float32)
-        tsf.common_data.camber[:nfoil] = camber.astype(np.float32)
-        tsf.common_data.thick[:nfoil] = thick.astype(np.float32)
         
         # Print or log geometry (equivalent to PRBODY call)
         if self.core.config['flag_print_info']:

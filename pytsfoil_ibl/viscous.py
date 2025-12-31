@@ -130,8 +130,8 @@ class ViscousCorrection:
         gam1 = tsf.common_data.gam1
         xdiff = tsf.common_data.xdiff
         delta = tsf.common_data.delta
-        reynld = tsf.common_data.reynld
-        wconst = tsf.common_data.wconst
+        reynld = self.core.config['REYNLD']
+        wconst = self.core.config['WCONST']
         sonvel = tsf.solver_data.sonvel
         wslp = tsf.solver_data.wslp
         

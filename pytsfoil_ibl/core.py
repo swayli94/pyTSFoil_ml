@@ -82,8 +82,7 @@ class TSFoilCore:
     def _default_config(self) -> None:
         """Setup default configuration parameters"""
         # Default configuration parameters (user input parameters, corresponding to namelist /INP/ in Fortran)
-        # NU, NL, DELTA are set in set_airfoil()
-        # IMAXI, JMAXI are set in set_mesh()
+        # DELTA are set in set_airfoil()
         self.config = {
             'AK': 0.0,              # Free stream similarity parameter
             'ALPHA': 0.0,           # Angle of attack
@@ -108,8 +107,8 @@ class TSFoilCore:
             'IFLAP': 0,             # Flap flag
             'DELFLP': 0.0,          # Flap deflection angle
             'FLPLOC': 0.77,         # Flap location
-            'n_point_x': 81,        # Grid points in x-direction (IMAXI)
-            'n_point_y': 60,        # Grid points in y-direction (JMAXI)
+            'n_point_x': 81,        # Grid points in x-direction
+            'n_point_y': 60,        # Grid points in y-direction
             'n_point_airfoil': 51,  # Number of points on airfoil surface
             
             'flag_output': True,          # Write solver process to tsfoil2.out

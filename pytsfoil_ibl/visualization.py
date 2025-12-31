@@ -30,7 +30,6 @@ class Visualizer:
     def plot_all_results(self, filename: str = 'tsfoil_results.png') -> None:
         """
         Plot all results, including:
-        - Mesh distribution analysis (read from XIN, YIN in tsfoil2.out)
         - Mach number distribution on Y=0 line (read from cpxs.dat)
         - Mach number field (read from field.dat)
 

@@ -590,8 +590,8 @@ class SolverManager:
         y_coords = tsf.common_data.y
         ak = tsf.common_data.ak
         bctype = tsf.common_data.bctype
-        iprter = tsf.common_data.iprter
-        maxit = tsf.common_data.maxit
+        iprter = self.core.config['IPRTER']
+        maxit = self.core.config['MAXIT']
         imin = tsf.common_data.imin
         jmin = tsf.common_data.jmin
         jmax = tsf.common_data.jmax
@@ -599,7 +599,6 @@ class SolverManager:
         idown = tsf.common_data.idown
         jtop = tsf.common_data.jtop
         jbot = tsf.common_data.jbot
-        we = tsf.common_data.we
         cverge = tsf.common_data.cverge
         dverge = tsf.common_data.dverge
         flag_output = tsf.common_data.flag_output
@@ -617,17 +616,14 @@ class SolverManager:
         # Initialize using NumPy slice assignment (much faster than loops)
         pold_arr[:, :] = 0.0
         emu_arr[:, :] = 0.0
-        
-        # Calculate maximum iterations based on refinement level
-        maxitm = maxit
-        
+                
         # Set relaxation parameter based on refinement level
         kk = 2  # 0-based index for WE(3) in Fortran
-        wep = we[kk]
+        wep = self.core.config['WE'][kk]
         tsf.solver_data.wi = 1.0 / wep
         
         if flag_output == 1:
-            print(f"\n   WE = {wep:7.4f}     EPS = {tsf.common_data.eps:8.4f}     MAXIT FOR THIS MESH = {maxitm:4d}")
+            print(f"\n   WE = {wep:7.4f}     EPS = {tsf.common_data.eps:8.4f}     MAXIT FOR THIS MESH = {maxit:4d}")
             print(f"\n  ITER     CL        CM    IERR JERR    ERROR")
             print(f"   IRL  JRL    BIGRL        ERCIRC")
         
@@ -699,7 +695,7 @@ class SolverManager:
         converged = False
         abort1 = False
         
-        for iter_num in range(1, maxitm + 1):
+        for iter_num in range(1, maxit + 1):
             
             # Initialize EMU and POLD arrays using vectorized operations
             # Fortran: POLD(JMIN:JMAX, I2) = P(JMIN:JMAX, IUP-1), EMU(JMIN:JMAX, I2) = 0.0
@@ -796,4 +792,4 @@ class SolverManager:
         # Handle case where iteration limit is reached
         if not converged and not abort1 and do_output:
             print(f"\n\n                    ******  ITERATION LIMIT REACHED  ******")
-            print(f"Iteration limit reached after {maxitm} iterations.")
+            print(f"Iteration limit reached after {maxit} iterations.")

@@ -30,14 +30,10 @@ module common_data
 
     integer :: BCTYPE = 1   ! Boundary condition identifiers (1 = free air, 2 = tunnel)
 
-    integer :: NU = 0, NL = 0 ! Number of lower/upper surface data points
     real :: XL(N_MESH_POINTS) = 0.0, XU(N_MESH_POINTS) = 0.0 ! Airfoil X-coordinates
     real :: YL(N_MESH_POINTS) = 0.0, YU(N_MESH_POINTS) = 0.0 ! Airfoil Y-coordinates
     real :: DELTA = 0.0       ! Maximum thickness of airfoil (set to zero to raise error)
 
-    integer :: IMAXI = 0, JMAXI = 0 ! User-input maximum number of X/Y-direction grid points
-    real :: XIN(NMP_plus2) = 0.0, YIN(NMP_plus2) = 0.0  ! User-input mesh coordinate arrays
-    
     logical :: KUTTA = .true. ! Whether Kutta condition is enforced
     logical :: FCR = .true.   ! Whether difference equations are fully conservative
 
@@ -47,16 +43,9 @@ module common_data
     real :: RIGF = 0.0      ! Rigidity factor for transonic effects
     real :: POR = 0.0       ! Porosity
 
-    real :: REYNLD = 4.0E6  ! Reynolds number
-    real :: WCONST = 4.0    ! Wall constant
-
     real :: WCIRC = 1.0         ! Weight for circulation jump at trailing edge (0.0-1.0)
-    integer :: IPRTER = 100     ! Print interval for convergence history
-    integer :: MAXIT = 1000     ! Maximum number of iterations
 
     real :: EPS = 0.2           ! Convergence tolerance 
-    real :: WE(3)               ! SOR relaxation factors
-    data WE /1.8, 1.9, 1.95/
     real :: CVERGE = 0.00001    ! Error criterion for convergence
     real :: DVERGE = 10.0       ! Error criterion for divergence
 
@@ -87,10 +76,6 @@ module common_data
 
     ! Airfoil arrays
     real :: VOL = 0.0
-    integer :: NFOIL = 0  ! Number of points on airfoil
-    real :: CAMBER(N_MESH_POINTS) = 0.0 ! Airfoil camber
-    real :: THICK(N_MESH_POINTS) = 0.0 ! Airfoil thickness
-    real :: XFOIL(N_MESH_POINTS) = 0.0 ! Airfoil X-coordinate
     real :: FU(N_MESH_POINTS) = 0.0 ! Upper surface interpolation
     real :: FL(N_MESH_POINTS) = 0.0 ! Lower surface interpolation
     real :: FXU(N_MESH_POINTS) = 0.0 ! Derivative of upper surface to X-coordinate
@@ -102,7 +87,6 @@ contains
     subroutine initialize_common()
         implicit none
 
-        ! Default initial values (will be overridden by READIN with IMAXI/JMAXI from input)
         IMAX = N_MESH_POINTS
         JMAX = N_MESH_POINTS
         
@@ -116,10 +100,6 @@ contains
         JTOP = JMAX - 1
         JBOT = JMIN + 1
 
-        ! Grid parameters (from BLOCK DATA)
-        IMAXI = 77  ! User-input maximum number of streamwise (X-direction) grid points (match default XIN)
-        JMAXI = N_MESH_POINTS  ! User-input maximum number of spanwise (Y-direction) grid points
-
         ! ------------------------------------------------
         ! Initialize all common data
         ! ------------------------------------------------
@@ -128,19 +108,12 @@ contains
     
         BCTYPE = 1
     
-        NU = 0
-        NL = 0
         XL = 0.0
         XU = 0.0
         YL = 0.0
         YU = 0.0
         DELTA = 0.0
-    
-        IMAXI = 0
-        JMAXI = 0
-        XIN = 0.0
-        YIN = 0.0
-        
+            
         KUTTA = .true.
         FCR = .true.
     
@@ -150,15 +123,9 @@ contains
         RIGF = 0.0
         POR = 0.0
     
-        REYNLD = 4.0E6
-        WCONST = 4.0
-    
         WCIRC = 1.0
-        IPRTER = 100
-        MAXIT = 1000
     
         EPS = 0.2
-        WE = [1.8, 1.9, 1.95]
         CVERGE = 0.00001
         DVERGE = 10.0
         F = 0.0
@@ -174,10 +141,6 @@ contains
         YDIFF = 0.0
     
         VOL = 0.0
-        NFOIL = 0
-        CAMBER = 0.0
-        THICK = 0.0
-        XFOIL = 0.0
 
     end subroutine initialize_common
 
