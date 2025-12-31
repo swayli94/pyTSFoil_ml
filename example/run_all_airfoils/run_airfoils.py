@@ -20,6 +20,8 @@ from pytsfoil_ibl import PyTSFoil
 
 
 N_PROCESSES = 40
+N_TEST_AIRFOILS = 40
+
 
 airfoil_database_path = os.path.join(project_root, 'data', 'airfoil_database.json')
 os.makedirs(os.path.join(path, 'results'), exist_ok=True)
@@ -39,18 +41,6 @@ def load_airfoil_database() -> Dict[str, Any]:
     with open(airfoil_database_path, 'r') as f:
         airfoil_database = json.load(f)
         
-    for entry in airfoil_database:
-        entry['ID'] = int(entry['ID'])
-        entry['Ma'] = float(entry['Ma'])
-        entry['AoA'] = float(entry['AoA'])
-        entry['Re'] = float(entry['Re'])
-        entry['Cl'] = float(entry['Cl'])
-        entry['Cd'] = float(entry['Cd'])
-        entry['Cm'] = float(entry['Cm'])
-        entry['tmax'] = float(entry['tmax'])
-        entry['cst_u'] = [float(c) for c in entry['cst_u']]
-        entry['cst_l'] = [float(c) for c in entry['cst_l']]
-    
     t1 = time.time()
     print(f"Loaded {len(airfoil_database)} airfoils in {t1-t0:.2f} seconds")
     
@@ -147,22 +137,46 @@ def run_pytsfoil(params: Dict[str, Any]) -> Dict[str, Any]:
         }
 
 
+def load_results(file_name: str) -> Dict[str, Any]:
+    '''
+    Load the results from the JSON files.
+    
+    Returns:
+    --------
+    Dict[str, Any]: Results dictionary
+    '''
+    results = {}
+    
+    with open(file_name, 'r') as f:
+        results = json.load(f)
+        
+        results['Aoa'] = float(results['config']['ALPHA'])
+        results['Mach'] = float(results['config']['EMACH'])
+        # results['Re'] = float(results['config']['REYNLD'])
+
+    return results
+
+
 if __name__ == "__main__":
     
     print('Working directory:', path)
     
     airfoil_database = load_airfoil_database()
     
+    if N_TEST_AIRFOILS > 0:
+        airfoil_database = airfoil_database[:N_TEST_AIRFOILS]
+        print(f"Running {N_TEST_AIRFOILS} test airfoils")
+    
     # Define multiple cases to run in parallel
     # Example: varying angle of attack and Mach number
     base_config = {
         'MAXIT': 9999,
-        'NWDGE': 0,
+        'NWDGE': 2,
         'n_point_x': 200,
         'n_point_y': 80,
         'n_point_airfoil': 100,
         'EPS': 0.2,
-        'CVERGE': 1e-6
+        'CVERGE': 1e-6,
     }
     
     # Create multiple parameter combinations
@@ -172,10 +186,12 @@ if __name__ == "__main__":
         case_config = base_config.copy()
         case_config.update({
             'ALPHA': entry['AoA'],
-            'EMACH': entry['Ma']
+            'EMACH': entry['Ma'],
+            'REYNLD': entry['Re'],
         })
         cases.append({
             'i_case': i_case,
+            'ID': entry['ID'],
             'cst_u': entry['cst_u'],
             'cst_l': entry['cst_l'],
             'config': case_config

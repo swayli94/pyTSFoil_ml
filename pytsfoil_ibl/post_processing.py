@@ -119,14 +119,12 @@ class PostProcessing:
 
     def compute_data_summary(self) -> None:
         """Compute data summary including lift and pitch coefficients"""
-        alpha = tsf.common_data.alpha
-        vfact = tsf.solver_data.vfact
         clfact = tsf.solver_data.clfact
         cmfact = tsf.solver_data.cmfact
         
         # Compute lift and pitch coefficients
-        self.core.data_summary['alpha'] = alpha * vfact
-        self.core.data_summary['mach'] = tsf.common_data.emach
+        self.core.data_summary['alpha'] = self.core.config['ALPHA']
+        self.core.data_summary['mach'] = self.core.config['EMACH']
         self.core.data_summary['cl'] = self.lift(clfact)
         self.core.data_summary['cm'] = self.pitch(cmfact)
         self.core.data_summary['cpstar'] = tsf.solver_data.cpstar

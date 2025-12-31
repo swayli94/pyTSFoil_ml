@@ -47,7 +47,6 @@ class OutputHandler:
         
         # Get solver data
         P = tsf.solver_data.p  # Pressure array
-        vfact = tsf.solver_data.vfact
         c1 = tsf.solver_data.c1
         cxl = tsf.solver_data.cxl
         cxc = tsf.solver_data.cxc
@@ -55,8 +54,6 @@ class OutputHandler:
         cpfact = tsf.solver_data.cpfact
         
         # Get configuration parameters
-        emach = tsf.common_data.emach
-        alpha = tsf.common_data.alpha
         delta = tsf.common_data.delta
                         
         # Open output file
@@ -67,8 +64,8 @@ class OutputHandler:
             with open(os.path.join(self.core.output_dir, "field.dat"), 'w') as f:
                 # Write Tecplot header
                 f.write('# Flow types: -1=Outside domain, 0=Elliptic, 1=Parabolic, 2=Hyperbolic, 3=Shock\n')
-                f.write(f'# Mach = {emach:10.6f}\n')
-                f.write(f'# Alpha = {alpha * vfact:10.6f}\n')
+                f.write(f'# Mach = {self.core.config['EMACH']:10.6f}\n')
+                f.write(f'# Alpha = {self.core.config['ALPHA']:10.6f}\n')
                 f.write(f'# CPFACT = {cpfact:10.6f}\n')
                 
                 f.write('VARIABLES = "X", "Y", "Mach", "Cp", "P", "FlowType"\n')
@@ -183,8 +180,7 @@ class OutputHandler:
         
         # Get configuration parameters
         delta = tsf.common_data.delta
-        emach = tsf.common_data.emach
-        phys = tsf.common_data.phys
+        emach = self.core.config['EMACH']
         
         # Initialize variables
         iem = 0
@@ -245,7 +241,7 @@ class OutputHandler:
                     return
                 
                 # Mach number warning
-                if iem == 1 and phys:
+                if iem == 1 and self.core.config['PHYS']:
                     f.write('0 ***** CAUTION *****\n')
                     f.write(' MAXIMUM MACH NUMBER EXCEEDS 1.3\n')
                     f.write(' SHOCK JUMPS IN ERROR IF UPSTREAM NORMAL MACH NUMBER GREATER THAN 1.3\n')
@@ -284,12 +280,11 @@ class OutputHandler:
         Translated from PRINT subroutine in io_module.f90
         """
         # Get required variables from Fortran modules
-        phys = tsf.common_data.phys
         simdef = tsf.common_data.simdef
         bctype = tsf.common_data.bctype
         fcr = tsf.common_data.fcr
         kutta = tsf.common_data.kutta
-        emach = tsf.common_data.emach
+        emach = self.core.config['EMACH']
         delta = tsf.common_data.delta
         ak = tsf.common_data.ak
         
@@ -327,12 +322,12 @@ class OutputHandler:
                 f.write(f'# BCTYPE = {bctype:10.6f}\n')
                 f.write(f'# FCR = {fcr:10.6f}\n')
                 f.write(f'# KUTTA = {kutta:10.6f}\n')
-                f.write(f'# PHYS = {phys:10.6f}\n')
+                f.write(f'# PHYS = {self.core.config['PHYS']}\n')
                 f.write(f'# SIMDEF = {simdef:10.6f}\n')
                 f.write(f'# SCALED POR = {tsf.common_data.por:10.6f}\n')
 
                 # Print similarity/physical variables information
-                if phys:
+                if self.core.config['PHYS']:
                     f.write('0 PRINTOUT IN PHYSICAL VARIABLES. \n')
                 else:
                     f.write('0 PRINTOUT IN SIMILARITY VARIABLES.\n')

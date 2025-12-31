@@ -67,7 +67,7 @@ class ViscousCorrection:
             if isk >= iend:
                 return -iend
 
-    def wangle(self, am2: float, nw: int, g: float) -> float:
+    def wangle(self, am2: float, g: float) -> float:
         """
         Compute wedge angle for viscous correction
         
@@ -75,8 +75,6 @@ class ViscousCorrection:
         ----------
         am2 : float
             Square of Mach number upstream of shock
-        nw : int
-            Wedge type (1=Murman, 2=Yoshihara)
         g : float
             GAM1 = gamma + 1
             
@@ -85,7 +83,7 @@ class ViscousCorrection:
         float
             Wedge angle in radians
         """
-        if nw == 1:
+        if self.core.config['NWDGE'] == 1:
             # Murman wedge
             return 4.0 * ((am2 - 1.0) / 3.0) ** 1.5 / g
         else:
@@ -132,7 +130,6 @@ class ViscousCorrection:
         gam1 = tsf.common_data.gam1
         xdiff = tsf.common_data.xdiff
         delta = tsf.common_data.delta
-        nwdge = tsf.common_data.nwdge
         reynld = tsf.common_data.reynld
         wconst = tsf.common_data.wconst
         sonvel = tsf.solver_data.sonvel
@@ -191,9 +188,9 @@ class ViscousCorrection:
             if am1sq <= 1.0:
                 jmp = 1
             else:
-                thamax[m, n] = self.wangle(am1sq, nwdge, gam1) * sign
+                thamax[m, n] = self.wangle(am1sq, gam1) * sign
                 
-                if nwdge == 1:
+                if self.core.config['NWDGE'] == 1:
                     # Murman wedge
                     reyx = reynld * xshk[m, n]
                     cf = 0.02666 / (reyx ** 0.139)
@@ -218,7 +215,7 @@ class ViscousCorrection:
                         aeta = (x_coords[i - 1] - xshk[m, n]) / zeta[m, n]
                         wslp[i - 1, m] = thamax[m, n] * (1.0 - aeta) ** 2 / delta
                 
-                elif nwdge == 2:
+                elif self.core.config['NWDGE'] == 2:
                     # Yoshihara wedge
                     isk1 = isk - 1
                     for i in range(isk1, isk + 1):

@@ -590,7 +590,6 @@ class SolverManager:
         y_coords = tsf.common_data.y
         ak = tsf.common_data.ak
         bctype = tsf.common_data.bctype
-        nwdge = tsf.common_data.nwdge
         iprter = tsf.common_data.iprter
         maxit = tsf.common_data.maxit
         imin = tsf.common_data.imin
@@ -684,13 +683,13 @@ class SolverManager:
         '''
         
         # Cache method references
-        _compute_vwedge = self.viscous_correction.compute_vwedge if nwdge > 0 else None
-        _setup_body_boundary = self.pre_processing.setup_body_boundary if nwdge > 0 else None
+        _compute_vwedge = self.viscous_correction.compute_vwedge if self.core.config['NWDGE'] > 0 else None
+        _setup_body_boundary = self.pre_processing.setup_body_boundary if self.core.config['NWDGE'] > 0 else None
         _lift = self.post_processing.lift
         _pitch = self.post_processing.pitch
         
         # Precompute conditions
-        do_vwedge = nwdge > 0
+        do_vwedge = self.core.config['NWDGE'] > 0
         do_output = flag_output == 1
         ak_subsonic = ak <= 0.0
         c1_val = c1_arr[1] if ak_subsonic else None  # C1(2) -> c1[1]

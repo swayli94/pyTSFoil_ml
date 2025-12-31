@@ -26,8 +26,6 @@ module common_data
     ! User-input parameters
     ! ------------------------------------------------
 
-    real :: EMACH = 0.75    ! Mach number
-    real :: ALPHA = 0.0     ! Angle of attack
     real :: CLSET = 0.0     ! Lift coefficient set-point
 
     integer :: BCTYPE = 1   ! Boundary condition identifiers (1 = free air, 2 = tunnel)
@@ -40,11 +38,9 @@ module common_data
     integer :: IMAXI = 0, JMAXI = 0 ! User-input maximum number of X/Y-direction grid points
     real :: XIN(NMP_plus2) = 0.0, YIN(NMP_plus2) = 0.0  ! User-input mesh coordinate arrays
     
-    logical :: PHYS = .true.  ! Physical (True) vs similarity (False)
     logical :: KUTTA = .true. ! Whether Kutta condition is enforced
     logical :: FCR = .true.   ! Whether difference equations are fully conservative
 
-    integer :: NWDGE = 0    ! Viscous wedge parameters (0 = no wedge, 1 = Murman wedge, 2 = Yoshihara wedge)
     integer :: SIMDEF = 3   ! Similarity scaling (1 = Cole, 2 = Spreiter, 3 = Krupp)
 
     real :: AK = 0.0        ! Free stream similarity parameter
@@ -128,8 +124,6 @@ contains
         ! Initialize all common data
         ! ------------------------------------------------
         
-        EMACH = 0.75
-        ALPHA = 0.0
         CLSET = 0.0
     
         BCTYPE = 1
@@ -147,11 +141,9 @@ contains
         XIN = 0.0
         YIN = 0.0
         
-        PHYS = .true.
         KUTTA = .true.
         FCR = .true.
     
-        NWDGE = 0
         SIMDEF = 3
     
         AK = 0.0

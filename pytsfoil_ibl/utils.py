@@ -83,25 +83,3 @@ def trap_integration(xi_arr: np.ndarray, arg_arr: np.ndarray, n_points: int) -> 
         w = arg_arr[i + 1] + arg_arr[i]
         sum_val += z * w
     return 0.5 * sum_val
-
-
-def validate_parameters(config: dict) -> None:
-    """
-    Validate the validity of configuration parameters
-    
-    Parameters
-    ----------
-    config: dict
-        Configuration parameter dictionary
-        
-    Raises
-    ------
-    ValueError
-        If parameters are not within valid range
-    """
-    if config['EMACH'] < 0.5 or config['EMACH'] > 2.0:
-        raise ValueError("EMACH must be between 0.5 and 2.0")
-    if config['ALPHA'] < -9.0 or config['ALPHA'] > 9.0:
-        raise ValueError("ALPHA must be between -9.0 and 9.0")
-    if config['NWDGE'] > 0 and config['EMACH'] > 1.0:
-        raise ValueError("NWDGE must be 0 if EMACH <= 1.0")

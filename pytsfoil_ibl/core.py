@@ -57,6 +57,9 @@ class TSFoilCore:
         
         # Setup default configuration
         self._default_config()
+        
+        # Attributes
+        self._alpha = 0.0 # Angle of attack after similarity scaling
     
     def _setup_directories(self, work_dir: str|None, output_dir: str|None) -> None:
         """Setup working directory and output directory"""
@@ -93,7 +96,7 @@ class TSFoilCore:
             'IPRTER': 100,          # Convergence history print interval
             'KUTTA': 1,             # Whether to enforce Kutta condition
             'MAXIT': 1000,          # Maximum number of iterations
-            'PHYS': 1,              # Physical coordinates vs similarity coordinates
+            'PHYS': True,           # Whether use in physical units, otherwise in similarity unitsts
             'POR': 0.0,             # Porosity
             'RIGF': 0.0,            # Rigidity factor for transonic effects
             'SIMDEF': 3,            # Similarity scaling (1 = Cole, 2 = Spreiter, 3 = Krupp)
@@ -149,11 +152,14 @@ class TSFoilCore:
         if self.config['ALPHA'] < -9.0 or self.config['ALPHA'] > 9.0:
             raise ValueError("ALPHA must be between -9.0 and 9.0")
         if self.config['NWDGE'] > 0 and self.config['EMACH'] > 1.0:
-            raise ValueError("NWDGE must be 0 if EMACH <= 1.0")
+            raise ValueError("NWDGE must be 0 if EMACH > 1.0")
         
         # Set AK=0 for physical coordinates
-        if self.config['PHYS'] == 1:
+        if self.config['PHYS']:
             self.config['AK'] = 0.0
+            
+        # Initialize without similarity scaling
+        self._alpha = self.config['ALPHA']
             
         # Constants
         self.n_mesh_points = tsf.common_data.n_mesh_points
@@ -187,15 +193,14 @@ class TSFoilCore:
             Local Mach number or similarity parameter
         """
         ak = tsf.common_data.ak
-        gam1 = tsf.common_data.gam1
-        phys = tsf.common_data.phys
+        gam1 = tsf.common_data.gam1 
         simdef = tsf.common_data.simdef
-        emach = tsf.common_data.emach
+        emach = self.config['EMACH']
         
         # Compute similarity parameter based on local velocity
         ak1 = ak - gam1 * u
         
-        if not phys:
+        if not self.config['PHYS']:
             # Return value of local similarity parameter
             return ak1
         else:
@@ -277,7 +282,7 @@ class TSFoilCore:
         ile = tsf.common_data.ile
         ite = tsf.common_data.ite
         ydiff = tsf.common_data.ydiff
-        alpha = tsf.common_data.alpha
+        alpha = self._alpha
         fxu = tsf.common_data.fxu
         fxl = tsf.common_data.fxl
         p_arr = tsf.solver_data.p

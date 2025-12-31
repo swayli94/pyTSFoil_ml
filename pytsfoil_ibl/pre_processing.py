@@ -93,15 +93,14 @@ class PreProcessing:
         If PHYS = False, input is already in scaled variables and no further scaling is done.
         """
         # Get required variables from Fortran modules
-        phys = tsf.common_data.phys
-        emach = tsf.common_data.emach
+        emach = self.core.config['EMACH']
         simdef = tsf.common_data.simdef
         delta = tsf.common_data.delta
         gam1 = tsf.common_data.gam1
         jmin = tsf.common_data.jmin
         jmax = tsf.common_data.jmax
         
-        if not phys:
+        if not self.core.config['PHYS']:
             # PHYS = False, no scaling
             tsf.solver_data.cpfact = 1.0
             tsf.solver_data.cdfact = 1.0
@@ -169,7 +168,7 @@ class PreProcessing:
             tsf.common_data.por = tsf.common_data.por * yfact
             
             # Scale angle of attack
-            tsf.common_data.alpha = tsf.common_data.alpha / vfact
+            self.core._alpha = self.core.config['ALPHA'] / vfact
         
         # Check value of AK for default
         if tsf.common_data.ak == 0.0:
@@ -695,7 +694,7 @@ class PreProcessing:
         jmin = tsf.common_data.jmin
         jmax = tsf.common_data.jmax
         ak = tsf.common_data.ak
-        alpha = tsf.common_data.alpha
+        alpha = self.core._alpha
         bctype = tsf.common_data.bctype
         por = tsf.common_data.por
         fxl = tsf.common_data.fxl

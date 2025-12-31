@@ -196,7 +196,7 @@ class MeshHandler:
         
         # Scaling factor
         delinv = 1.0
-        if self.core.config['PHYS'] == 1:
+        if self.core.config['PHYS']:
             delinv = 1.0 / delta
 
         # Upper surface cubic spline interpolation
